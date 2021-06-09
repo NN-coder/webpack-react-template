@@ -1,15 +1,20 @@
 const path = require('path');
-const { HotModuleReplacementPlugin } = require('webpack');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { EnvironmentPlugin, HotModuleReplacementPlugin } = require('webpack');
+
+const { NODE_ENV } = process.env;
+const isDev = NODE_ENV === 'development';
 
 module.exports = {
-  entry: path.resolve(__dirname, 'src/index.jsx'),
+  mode: NODE_ENV,
+  entry: path.resolve(__dirname, 'src/index.tsx'),
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'bundle.js',
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
   devServer: {
     hot: true,
@@ -19,13 +24,15 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.[jt]sx?$/,
         use: 'babel-loader',
       },
     ],
   },
   plugins: [
-    new HotModuleReplacementPlugin(),
+    isDev && new HotModuleReplacementPlugin(),
+    new EnvironmentPlugin({ NODE_ENV }),
+    new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({ template: path.resolve(__dirname, 'public/index.html') }),
-  ],
+  ].filter(Boolean),
 };
