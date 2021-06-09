@@ -1,4 +1,5 @@
 const path = require('path');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { EnvironmentPlugin, HotModuleReplacementPlugin } = require('webpack');
@@ -31,6 +32,7 @@ module.exports = {
   },
   plugins: [
     isDev && new HotModuleReplacementPlugin(),
+    isDev && new ReactRefreshWebpackPlugin(),
     new EnvironmentPlugin({ NODE_ENV }),
     new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({ template: path.resolve(__dirname, 'public/index.html') }),
