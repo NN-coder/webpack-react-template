@@ -14,5 +14,7 @@
     "allowJs": true,
     "checkJs": false,
     "sourceMap": true
-  }
+  },
+  "include": ["src"],
+  "exclude": ["build", "node_modules"]
 }

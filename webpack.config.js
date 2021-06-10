@@ -7,6 +7,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
 const { EnvironmentPlugin, HotModuleReplacementPlugin } = require('webpack');
 
 const { NODE_ENV } = process.env;
@@ -29,7 +30,8 @@ module.exports = {
   entry: resolveIndexFile(),
   output: {
     path: resolve('build'),
-    filename: 'bundle.js',
+    filename: isDev ? 'js/bundle.js' : 'js/[name].[contenthash].js',
+    chunkFilename: isDev ? 'js/[name].chunk.js' : 'js/[name].[contenthash].chunk.js',
   },
   resolve: {
     extensions: extensions.map((ext) => `.${ext}`),
@@ -43,35 +45,20 @@ module.exports = {
     rules: [
       {
         test: /\.[jt]sx?$/,
-        use: [
-          'babel-loader',
-          {
-            loader: '@linaria/webpack-loader',
-            options: {
-              sourceMap: isDev,
-            },
-          },
-        ],
+        use: ['babel-loader', '@linaria/webpack-loader'],
       },
       {
         test: /\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: isDev,
-            },
-          },
-        ],
+        use: [isDev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
       },
     ],
   },
   plugins: [
-    isDev && new HotModuleReplacementPlugin(),
-    isDev && new ReactRefreshWebpackPlugin(),
     new CaseSensitivePathsWebpackPlugin(),
     new CleanWebpackPlugin(),
+    new EnvironmentPlugin({ NODE_ENV }),
+    new ForkTsCheckerWebpackPlugin(),
+    new HtmlWebpackPlugin({ template: resolve('public/index.html') }),
     new CopyWebpackPlugin({
       patterns: [
         {
@@ -81,9 +68,14 @@ module.exports = {
         },
       ],
     }),
-    new EnvironmentPlugin({ NODE_ENV }),
-    new ForkTsCheckerWebpackPlugin(),
-    new HtmlWebpackPlugin({ template: resolve('public/index.html') }),
-    new MiniCssExtractPlugin({ filename: 'index.css' }),
+    isDev && new HotModuleReplacementPlugin(),
+    isDev && new ReactRefreshWebpackPlugin(),
+    !isDev && new MiniCssExtractPlugin({ filename: 'css/main.[contenthash].css' }),
+    !isDev &&
+      new OptimizeCssAssetsWebpackPlugin({
+        cssProcessorPluginOptions: {
+          preset: ['default', { discardComments: { removeAll: true } }],
+        },
+      }),
   ].filter(Boolean),
 };
