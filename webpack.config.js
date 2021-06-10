@@ -6,6 +6,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ImageMinimizerWebpackPlugin = require('image-minimizer-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
 const { EnvironmentPlugin, HotModuleReplacementPlugin } = require('webpack');
@@ -51,6 +52,13 @@ module.exports = {
         test: /\.css$/,
         use: [isDev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
       },
+      {
+        test: /\.(png|jpe?g|gif|ico|webp|svg)/,
+        use: {
+          loader: 'file-loader',
+          options: { name: isDev ? 'img/[name].[ext]' : 'img/[name].[contenthash].[ext]' },
+        },
+      },
     ],
   },
   plugins: [
@@ -75,6 +83,18 @@ module.exports = {
       new OptimizeCssAssetsWebpackPlugin({
         cssProcessorPluginOptions: {
           preset: ['default', { discardComments: { removeAll: true } }],
+        },
+      }),
+    !isDev &&
+      new ImageMinimizerWebpackPlugin({
+        minimizerOptions: {
+          plugins: [
+            ['gifsicle', { interlaced: true }],
+            ['jpegtran', { progressive: true }],
+            ['optipng', { optimizationLevel: 4 }],
+            ['svgo'],
+            ['webp', { quality: 85 }],
+          ],
         },
       }),
   ].filter(Boolean),
