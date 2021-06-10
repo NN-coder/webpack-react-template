@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const CaseSensitivePathsWebpackPlugin = require('case-sensitive-paths-webpack-plugin');
@@ -11,16 +12,24 @@ const { NODE_ENV } = process.env;
 const isDev = NODE_ENV === 'development';
 
 const resolve = (...pathSegments) => path.resolve(process.cwd(), ...pathSegments);
+const packageJson = require(resolve('package.json'));
+const extensions = ['tsx', 'ts', 'jsx', 'js'];
+
+const resolveIndexFile = () => {
+  if (fs.existsSync(resolve(packageJson.main))) return resolve(packageJson.main);
+  const ext = extensions.find((ext) => fs.existsSync(resolve(`src/index.${ext}`)));
+  return resolve(`src/index.${ext}`);
+};
 
 module.exports = {
   mode: NODE_ENV,
-  entry: resolve('src/index.tsx'),
+  entry: resolveIndexFile(),
   output: {
     path: resolve('build'),
     filename: 'bundle.js',
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.jsx', '.js'],
+    extensions: extensions.map((ext) => `.${ext}`),
   },
   devServer: {
     hot: true,

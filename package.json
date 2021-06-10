@@ -1,7 +1,7 @@
 {
   "name": "webpack-react-template",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "src/index.tsx",
   "repository": "git@github.com:NN-coder/webpack-react-template.git",
   "author": "Nikita Naleikin <trubatvoia3@gmail.com>",
   "license": "MIT",
