@@ -6,6 +6,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvironmentPlugin, HotModuleReplacementPlugin } = require('webpack');
 
 const { NODE_ENV } = process.env;
@@ -23,6 +24,8 @@ const resolveIndexFile = () => {
 
 module.exports = {
   mode: NODE_ENV,
+  target: isDev ? 'web' : 'browserslist',
+  devtool: isDev && 'cheap-module-source-map',
   entry: resolveIndexFile(),
   output: {
     path: resolve('build'),
@@ -40,7 +43,27 @@ module.exports = {
     rules: [
       {
         test: /\.[jt]sx?$/,
-        use: 'babel-loader',
+        use: [
+          'babel-loader',
+          {
+            loader: '@linaria/webpack-loader',
+            options: {
+              sourceMap: isDev,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: isDev,
+            },
+          },
+        ],
       },
     ],
   },
@@ -61,5 +84,6 @@ module.exports = {
     new EnvironmentPlugin({ NODE_ENV }),
     new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({ template: resolve('public/index.html') }),
+    new MiniCssExtractPlugin({ filename: 'index.css' }),
   ].filter(Boolean),
 };
