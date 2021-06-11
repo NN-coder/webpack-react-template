@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-a11y/recommended",
+    "stylelint-config-rational-order",
+    "stylelint-config-prettier",
+    "@linaria/stylelint"
+  ],
+  "rules": {
+    "value-keyword-case": ["lower", { "ignoreKeywords": ["/.+/"] }],
+    "function-name-case": ["lower", { "ignoreFunctions": ["/.+/"] }]
+  }
+}

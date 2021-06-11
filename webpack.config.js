@@ -24,6 +24,19 @@ const resolveIndexFile = () => {
   return resolve(`src/index.${ext}`);
 };
 
+const getPublicUrl = () => {
+  const { homepage } = packageJson;
+
+  if (homepage) {
+    if (homepage.startsWith('.')) return isDev ? '/' : homepage;
+    return new URL(homepage.endsWith('/') ? homepage : `${homepage}/`).pathname;
+  }
+
+  return '/';
+};
+
+const publicUrl = getPublicUrl();
+
 module.exports = {
   mode: NODE_ENV,
   target: isDev ? 'web' : 'browserslist',
@@ -33,6 +46,7 @@ module.exports = {
     path: resolve('build'),
     filename: isDev ? 'js/bundle.js' : 'js/[name].[contenthash].js',
     chunkFilename: isDev ? 'js/[name].chunk.js' : 'js/[name].[contenthash].chunk.js',
+    publicPath: publicUrl,
   },
   resolve: {
     extensions: extensions.map((ext) => `.${ext}`),
@@ -64,9 +78,9 @@ module.exports = {
   plugins: [
     new CaseSensitivePathsWebpackPlugin(),
     new CleanWebpackPlugin(),
-    new EnvironmentPlugin({ NODE_ENV }),
+    new EnvironmentPlugin({ NODE_ENV, PUBLIC_URL: publicUrl }),
     new ForkTsCheckerWebpackPlugin(),
-    new HtmlWebpackPlugin({ template: resolve('public/index.html') }),
+    new HtmlWebpackPlugin({ template: resolve('public/index.html'), publicPath: publicUrl }),
     new CopyWebpackPlugin({
       patterns: [
         {
