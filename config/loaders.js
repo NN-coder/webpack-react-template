@@ -1,14 +1,13 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { extensions, getPublicUrl } = require('./utils');
+const { extensions } = require('./utils');
+const getBabelConfig = require('./babel.config');
+const getPostcssConfig = require('./postcss.config');
 
-const isDev = process.env.NODE_ENV === 'development';
-const publicUrl = getPublicUrl();
-
-const loaders = [
+module.exports = ({ isDev, publicUrl }) => [
   {
     test: new RegExp(`\\.(${extensions.join('|')})`),
     exclude: /node_modules/,
-    use: ['babel-loader', '@linaria/webpack-loader'],
+    use: { loader: 'babel-loader', options: { ...getBabelConfig(isDev), cacheDirectory: true } },
   },
   {
     test: /\.css$/,
@@ -16,17 +15,21 @@ const loaders = [
       isDev
         ? 'style-loader'
         : { loader: MiniCssExtractPlugin.loader, options: { publicPath: publicUrl } },
-      'css-loader',
-      'postcss-loader',
+      { loader: 'css-loader', options: { sourceMap: isDev, url: false } },
+      {
+        loader: 'postcss-loader',
+        options: { postcssOptions: getPostcssConfig(isDev), sourceMap: isDev },
+      },
     ],
   },
   {
     test: /\.(png|jpe?g|gif|ico|webp|svg)/,
     use: {
       loader: 'file-loader',
-      options: { name: isDev ? 'img/[name].[ext]' : 'img/[name].[contenthash].[ext]' },
+      options: {
+        name: isDev ? 'img/[name].[ext]' : 'img/[name].[contenthash].[ext]',
+        publicPath: publicUrl,
+      },
     },
   },
 ];
-
-module.exports = loaders;

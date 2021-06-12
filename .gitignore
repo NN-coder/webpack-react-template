@@ -11,7 +11,6 @@
 
 # misc
 .vscode
-.linaria-cache
 .DS_Store
 .env.local
 .env.development.local

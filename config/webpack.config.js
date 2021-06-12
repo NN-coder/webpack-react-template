@@ -1,6 +1,7 @@
+const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
 const { resolveIndexFile, extensions, resolve, getPublicUrl } = require('./utils');
-const loaders = require('./loaders');
-const plugins = require('./plugins');
+const getLoaders = require('./loaders');
+const getPlugins = require('./plugins');
 
 const { NODE_ENV } = process.env;
 const isDev = NODE_ENV === 'development';
@@ -14,7 +15,7 @@ module.exports = {
   entry: resolveIndexFile(),
   output: {
     path: resolve('build'),
-    filename: isDev ? 'js/bundle.js' : 'js/[name].[contenthash].js',
+    filename: isDev ? 'js/main.js' : 'js/[name].[contenthash].js',
     chunkFilename: isDev ? 'js/[name].chunk.js' : 'js/[name].[contenthash].chunk.js',
     publicPath: publicUrl,
   },
@@ -27,7 +28,22 @@ module.exports = {
     port: 3000,
   },
   module: {
-    rules: loaders,
+    rules: getLoaders({ isDev, publicUrl }),
   },
-  plugins,
+  plugins: getPlugins({ isDev, publicUrl }),
+  optimization: {
+    minimizer: [
+      '...',
+      new CssMinimizerWebpackPlugin({
+        minimizerOptions: {
+          preset: [
+            'default',
+            {
+              discardComments: { removeAll: true },
+            },
+          ],
+        },
+      }),
+    ],
+  },
 };
