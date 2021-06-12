@@ -1,14 +1,20 @@
 import React from 'react';
-import { headerClass } from './style.css';
-import 'normalize.css';
+import logo from './logo.svg';
+import { appClass, appHeaderClass, appLinkClass, appLogoClass } from './App.css';
 
 export const App: React.FC = () => (
-  <div className="App">
-    <header className={headerClass}>
+  <div className={appClass}>
+    <header className={appHeaderClass}>
+      <img src={logo} className={appLogoClass} alt="logo" />
       <p>
-        Edit <code>src/App.js</code> and save to reload.
+        Edit <code>src/App.tsx</code> and save to reload.
       </p>
-      <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
+      <a
+        className={appLinkClass}
+        href="https://reactjs.org"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         Learn React
       </a>
     </header>
