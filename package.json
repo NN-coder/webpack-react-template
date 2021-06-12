@@ -6,8 +6,8 @@
   "author": "Nikita Naleikin <trubatvoia3@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=development webpack serve",
-    "build": "cross-env NODE_ENV=production webpack"
+    "start": "cross-env NODE_ENV=development webpack serve -c config/webpack.config.js",
+    "build": "cross-env NODE_ENV=production webpack -c config/webpack.config.js"
   },
   "dependencies": {
     "@linaria/babel-preset": "3.0.0-beta.4",
