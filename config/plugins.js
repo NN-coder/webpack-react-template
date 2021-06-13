@@ -10,8 +10,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvironmentPlugin, HotModuleReplacementPlugin } = require('webpack');
 const { resolve, extensions } = require('./utils');
 
-module.exports = ({ isDev, publicUrl }) =>
-  [
+module.exports = ({ isDev, publicUrl }) => {
+  publicUrl = publicUrl.slice(0, -1);
+
+  return [
     new VanillaExtractPlugin(),
     new CaseSensitivePathsWebpackPlugin(),
     new CleanWebpackPlugin(),
@@ -25,7 +27,10 @@ module.exports = ({ isDev, publicUrl }) =>
       ],
     }),
     new ForkTsCheckerWebpackPlugin({ eslint: { files: `./src/**/*.{${extensions.join(',')}}` } }),
-    new HtmlWebpackPlugin({ template: resolve('public/index.html'), publicPath: publicUrl }),
+    new HtmlWebpackPlugin({
+      template: resolve('public/index.html'),
+      publicPath: publicUrl,
+    }),
     new EnvironmentPlugin({
       NODE_ENV: isDev ? 'development' : 'production',
       PUBLIC_URL: publicUrl,
@@ -50,3 +55,4 @@ module.exports = ({ isDev, publicUrl }) =>
         chunkFilename: isDev ? 'css/[name].chunk.css' : 'css/[name].[contenthash].chunk.css',
       }),
   ].filter(Boolean);
+};
