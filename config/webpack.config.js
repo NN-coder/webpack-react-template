@@ -26,6 +26,10 @@ module.exports = {
     hot: true,
     open: true,
     port: 3000,
+    historyApiFallback: {
+      disableDotRule: true,
+      index: publicUrl,
+    },
   },
   module: {
     rules: getLoaders({ isDev, publicUrl }),
